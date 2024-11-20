@@ -363,3 +363,21 @@
        state: present
      loop: "{{libs}}"
      tags: libs
+
+# -- Python ansible pip usage dependency - use ansible.builtin.pip after -- #
+   - name: Python pip dependency
+     ansible.builtin.shell:
+       cmd: pip install '{{ python_min_pip_dep_req }}' > /dev/null 2>&1;pip list --disable-pip-version-check | grep '{{python_min_pip_dep_req}}' | awk '{print $1}'
+     register: pip_usage_dep_req
+     changed_when: pip_usage_dep_req.stdout.find( python_min_pip_dep_req ) == -1
+     become: yes
+     tags: pip_dep
+
+# -- Python Packages Installed using pip -- #
+   - name: Python Packages Requuired Using pip
+     ansible.builtin.pip:
+       name: "{{ item }}"
+       state: present
+     loop: "{{ python_pip_installs_req | default([]) }}"
+     when: python_pip_installs_req | length > 0
+     tags: pip_lib_installs

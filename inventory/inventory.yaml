@@ -118,3 +118,7 @@ all:
           - java-17-openjdk
           - nc
           - wget
+          - python3-devel
+        python_min_pip_dep_req: packaging
+        python_pip_installs_req:
+          - ansible-lint
