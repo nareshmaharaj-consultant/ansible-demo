@@ -119,6 +119,7 @@ all:
           - nc
           - wget
           - python3-devel
+          - git
         python_min_pip_dep_req: packaging
         python_pip_installs_req:
           - ansible-lint
