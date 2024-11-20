@@ -1,0 +1,120 @@
+all:
+  children:
+    myhosts:
+      hosts:
+        broker01:
+          ansible_host: 192.168.56.151
+          ansible_ssh_user: vagrant
+          ansible_ssh_private_key_file: /Users/nareshmaharaj/.ssh/id_ed25519
+          ansible_python_interpreter: /usr/bin/python
+          ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
+        broker02:
+          ansible_host: 192.168.56.152
+          ansible_ssh_user: vagrant
+          ansible_ssh_private_key_file: /Users/nareshmaharaj/.ssh/id_ed25519
+          ansible_python_interpreter: /usr/bin/python
+          ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
+        broker03:
+          ansible_host: 192.168.56.153
+          ansible_ssh_user: vagrant
+          ansible_ssh_private_key_file: /Users/nareshmaharaj/.ssh/id_ed25519
+          ansible_python_interpreter: /usr/bin/python
+          ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
+      vars:
+        libs:
+          - nc
+          - wget
+          - openssl-devel
+          - git
+          - gcc
+          - maven
+          - bind-utils
+          - java-11-openjdk.x86_64
+          - java-11-openjdk
+          - java-11-openjdk-devel
+          - cairo-devel
+          - pkg-config
+          - python3-devel
+          - python-firewall
+        python_libs:
+          - openssl-devel
+          - bzip2-devel
+          - libffi-devel
+          - sqlite-devel
+        python_version: 3.12.1
+        python_bin_url: https://www.python.org/ftp/python/3.12.1/Python-3.12.1.tgz
+        python_bin_name: Python-3.12.1
+        python_exec_path: /usr/local/bin/python3.12
+        python_min_pip_dep_req: packaging
+        python_unpacked_dir: /tmp/Python-3.12.1/
+        python_download_to_dir: /tmp/
+        python_pip_installs_req:
+          - meson
+          - pycairo
+          - bottle
+          - SQLAlchemy
+        firewall_ports:
+          - 6443/tcp
+          - 10250/tcp
+          - 3000/tcp
+          - 3001/tcp
+          - 3002/tcp
+          - 9145/tcp
+          - 8888/tcp
+          - 2181/tcp
+          - 27027/tcp
+          - 28027/tcp
+          - 29027/tcp
+          - 30027/tcp
+          - 31027/tcp
+          - 32027/tcp
+          - 33027/tcp
+          - 34027/tcp
+          - 2888/tcp
+          - 3888/tcp
+          - 9092/tcp
+          - 22/tcp
+        java_dir_loc: /etc/alternatives/java_sdk_11_openjdk/bin/
+        java_dir_link_to: /usr/bin/
+        scala_install_loc: /home/vagrant/cs
+        scala_binary: /home/vagrant/.local/share/coursier/bin/scala
+        scala_download_url: https://github.com/coursier/coursier/releases/latest/download/cs-x86_64-pc-linux.gz
+        user: vagrant
+    jenkins:
+      hosts:
+        broker04:
+          ansible_host: 192.168.56.154
+          ansible_ssh_user: vagrant
+          ansible_ssh_private_key_file: /Users/nareshmaharaj/.ssh/id_ed25519
+          ansible_python_interpreter: /usr/bin/python
+          ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
+      vars:
+        libs:
+          - fontconfig
+          - java-17-openjdk
+          - jenkins
+          - nc
+          - wget
+          - git
+          - python3-devel
+        jenkins_gpg_key_url: "https://pkg.jenkins.io/redhat-stable/jenkins.io.key"
+        jenkins_repo_url: "https://pkg.jenkins.io/redhat-stable/jenkins.repo"
+        jenkins_repo_dest: /etc/yum.repos.d/jenkins.repo
+        jenkins_pwd_show: false # once changed on gui front end pwd file removed
+        python_min_pip_dep_req: packaging
+        python_pip_installs_req:
+          - ansible-lint
+    jenkins-node:
+      hosts:
+        broker05:
+          ansible_host: 192.168.56.155
+          ansible_ssh_user: vagrant
+          ansible_ssh_private_key_file: /Users/nareshmaharaj/.ssh/id_ed25519
+          ansible_python_interpreter: /usr/bin/python
+          ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
+      vars:
+        vars:
+        libs:
+          - java-17-openjdk
+          - nc
+          - wget
