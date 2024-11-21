@@ -45,7 +45,7 @@ all:
         python_bin_url: https://www.python.org/ftp/python/3.12.1/Python-3.12.1.tgz
         python_bin_name: Python-3.12.1
         python_exec_path: /usr/local/bin/python3.12
-        python_min_pip_dep_req: packaging
+        pip_min_dep: packaging
         python_unpacked_dir: /tmp/Python-3.12.1/
         python_download_to_dir: /tmp/
         python_pip_installs_req:
