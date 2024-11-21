@@ -160,10 +160,12 @@
 
     # -- Python ansible pip usage dependency - use ansible.builtin.pip after -- #
     - name: Python pip dependency
-      ansible.builtin.shell:
-        cmd: set -o pipefail;pip install '{{ python_min_pip_dep_req }}' > /dev/null 2>&1;pip list --disable-pip-version-check | grep '{{ python_min_pip_dep_req }}' | awk '{print $1}'
+      ansible.builtin.shell: |
+        set -o pipefail
+        pip install '{{ pip_min_dep }}' > /dev/null 2>&1
+        pip list --disable-pip-version-check | grep '{{ pip_min_dep }}' | awk '{print $1}'
       register: pip_usage_dep_req
-      changed_when: pip_usage_dep_req.stdout.find(python_min_pip_dep_req) == -1
+      changed_when: pip_usage_dep_req.stdout.find(pip_min_dep) == -1
       become: true
       tags: pip_dep
 
@@ -203,7 +205,7 @@
     - name: Gather firewall info before changes
       ansible.posix.firewalld_info:
         active_zones: true
-      register: result_before_firewall_changes
+      register: before_fw_chg
       tags: firewall_before
 
     - name: Add Firewall Port
@@ -219,12 +221,12 @@
     - name: Gather firewall info after changes
       ansible.posix.firewalld_info:
         active_zones: true
-      register: result_after_firewall_changes
+      register: after_fw_chg
       tags: firewall_after
 
     - name: Compare Firewall Open Ports Before & After Results
       ansible.builtin.set_fact:
-        all_ports_open: "{{ (result_after_firewall_changes.firewalld_info.zones.public.ports | difference(result_before_firewall_changes.firewalld_info.zones.public.ports)) }}"
+        all_ports_open: "{{ (after_fw_chg.firewalld_info.zones.public.ports | difference(before_fw_chg.firewalld_info.zones.public.ports)) }}"
       tags: firewall_i
 
     - name: Restart network service for firewalld
@@ -358,9 +360,9 @@
     # -- Python ansible pip usage dependency - use ansible.builtin.pip after -- #
     - name: Python pip dependency
       ansible.builtin.shell:
-        cmd: set -o pipefail;pip install '{{ python_min_pip_dep_req }}' > /dev/null 2>&1;pip list --disable-pip-version-check | grep '{{ python_min_pip_dep_req }}' | awk '{print $1}'
+        cmd: set -o pipefail;pip install '{{ pip_min_dep }}' > /dev/null 2>&1;pip list --disable-pip-version-check | grep '{{ pip_min_dep }}' | awk '{print $1}'
       register: pip_usage_dep_req
-      changed_when: pip_usage_dep_req.stdout.find(python_min_pip_dep_req) == -1
+      changed_when: pip_usage_dep_req.stdout.find(pip_min_dep) == -1
       become: true
       tags: pip_dep
 
@@ -388,9 +390,9 @@
     # -- Python ansible pip usage dependency - use ansible.builtin.pip after -- #
     - name: Python pip dependency
       ansible.builtin.shell:
-        cmd: set -o pipefail;pip install '{{ python_min_pip_dep_req }}' > /dev/null 2>&1;pip list --disable-pip-version-check | grep '{{ python_min_pip_dep_req }}' | awk '{print $1}'
+        cmd: set -o pipefail;pip install '{{ pip_min_dep }}' > /dev/null 2>&1;pip list --disable-pip-version-check | grep '{{ pip_min_dep }}' | awk '{print $1}'
       register: pip_usage_dep_req
-      changed_when: pip_usage_dep_req.stdout.find(python_min_pip_dep_req) == -1
+      changed_when: pip_usage_dep_req.stdout.find(pip_min_dep) == -1
       become: true
       tags: pip_dep
 
