@@ -1,5 +1,5 @@
 ansible-navigator.log
 .vagrant/
-context/
 old/
 inventory/.inventory.yaml.swp
+context/
