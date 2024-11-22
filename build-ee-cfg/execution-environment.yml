@@ -15,3 +15,5 @@ dependencies:
   galaxy:
     collections:
     - name: community.postgresql
+    - name: ansible.posix
+    
