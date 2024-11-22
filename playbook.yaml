@@ -406,12 +406,12 @@
       tags: pip_lib_installs
 
     # -- Add repo - check with yum repolist
-    - name: Add repository
+    - name: Add Docker Repo
       ansible.builtin.yum_repository:
         name: docker-ce-stable
         description: Docker CE Repo
-        baseurl: "https://download.docker.com/linux/centos/docker-ce.repo"
-        tags: docker
+        baseurl: https://download.docker.com/linux/centos/docker-ce.repo
+      tags: docker
 
     # -- Install Docker libs
     - name: Install Docker Libs
@@ -419,4 +419,12 @@
         name: "{{ item }}"
         state: present
       loop: "{{ docker_libs }}"
+      tags: docker
+
+    - name: Start Docker Service
+      ansible.builtin.systemd_service:
+        state: started
+        daemon_reload: true
+        enabled: true
+        name: docker
       tags: docker
