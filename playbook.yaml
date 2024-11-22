@@ -253,7 +253,7 @@
       when: swap_enabled.stdout.find('0') == -1
       tags: swap
 
-# --  Install Libraries for CI/CD -- #
+# --  JENKINS: Install Libraries for CI/CD -- #
 - name: Install Jenkin Libaries
   hosts: jenkins
   become: true
@@ -375,7 +375,7 @@
       when: python_pip_installs_req | length > 0
       tags: pip_lib_installs
 
-# --  Install Libraries for CI/CD -- #
+# --  JENKINS Node: Install Libraries for CI/CD -- #
 - name: Install Jenkin NODE Libaries
   hosts: jenkins-node
   become: true
@@ -404,3 +404,19 @@
       loop: "{{ python_pip_installs_req | default([]) }}"
       when: python_pip_installs_req | length > 0
       tags: pip_lib_installs
+
+    # -- Add repo - check with yum repolist
+    - name: Add repository
+      ansible.builtin.yum_repository:
+        name: docker-ce-stable
+        description: Docker CE Repo
+        baseurl: "https://download.docker.com/linux/centos/docker-ce.repo"
+        tags: docker
+
+    # -- Install Docker libs
+    - name: Install Docker Libs
+      ansible.builtin.dnf:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ docker_libs }}"
+      tags: docker
