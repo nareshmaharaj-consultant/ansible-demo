@@ -4,13 +4,31 @@
   hosts: all
   become: true
   tasks:
+    - name: Include variable of hostsnames for all machines
+      ansible.builtin.include_vars:
+        file: hosts_template.yaml
+        name: hosts_names_ips
+      tags: host_name
+
     - name: "Update Hosts file /etc/hosts"
-      ansible.builtin.template:
-        src: hosts_template.j2
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        state: present
+        line: "{{ item }}"
+      loop: "{{ hosts_names_ips.hostname }}"
+      tags: host_name
+
+    - name: Get hostname of current host
+      ansible.builtin.shell: echo $HOSTNAME
+      register: result_hostname
+      changed_when: false
+      tags: host_name
+
+    - name: "Insert hostname to /etc/hosts"
+      ansible.builtin.lineinfile:
         dest: /etc/hosts
-        mode: '0644'
-      become: true
-      tags: update_hosts
+        line: "127.0.0.1 {{ result_hostname.stdout }}"
+      tags: host_name
 
 # --  Install Libraries Required from list -- #
 - name: Install Required Libaries
