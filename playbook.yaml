@@ -36,11 +36,11 @@
   become: true
   tasks:
     - name: Get Jenkins Node Public Key
-      set_fact:
+      ansible.builtin.set_fact:
         jenkins_node_key: "{{ lookup('file', 'jenkins_node_pub_key/id_rsa.pub', fail_on_missing=true) }}"
 
     - name: Add Jenkins Node Key to Authorized Keys
-      authorized_key:
+      ansible.posix.authorized_key:
         user: vagrant  # Assuming user with access to deploy software
         key: "{{ jenkins_node_key }}"
         state: present
