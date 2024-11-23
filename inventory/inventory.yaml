@@ -121,6 +121,7 @@ all:
           - python3-devel
           - git
           - dnf-plugins-core
+          - sshpass
         docker_libs:
           - docker-ce 
           - docker-ce-cli 
