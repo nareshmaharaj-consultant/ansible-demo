@@ -35,6 +35,16 @@
   hosts: deploy_machines
   become: true
   tasks:
+    - name: Get Jenkins Node Public Key
+      set_fact:
+        jenkins_node_key: "{{ lookup('file', 'jenkins_node_pub_key/id_rsa.pub', fail_on_missing=true) }}"
+
+    - name: Add Jenkins Node Key to Authorized Keys
+      authorized_key:
+        user: vagrant  # Assuming user with access to deploy software
+        key: "{{ jenkins_node_key }}"
+        state: present
+
     - name: Install Libraries
       ansible.builtin.dnf:
         name: "{{ item }}"
@@ -455,3 +465,11 @@
         enabled: true
         name: docker
       tags: docker
+
+    - name: Storing ssh public key for jenkins node.
+      ansible.builtin.fetch:
+        src: /home/vagrant/.ssh/id_rsa.pub
+        dest: jenkins_node_pub_key/
+        flat: true
+      tags: get_jenkins_node_pub
+      become: true
