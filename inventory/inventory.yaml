@@ -113,7 +113,6 @@ all:
           ansible_python_interpreter: /usr/bin/python
           ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
       vars:
-        vars:
         libs:
           - java-17-openjdk
           - nc
@@ -132,3 +131,4 @@ all:
         python_pip_installs_req:
           - ansible-lint
           - ansible-navigator
+        user: vagrant
