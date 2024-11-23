@@ -6,7 +6,7 @@
   tasks:
     - name: Include variable of hostsnames for all machines
       ansible.builtin.include_vars:
-        file: hosts_template.yaml
+        file: hosts.yaml
         name: hosts_names_ips
       tags: host_name
 
