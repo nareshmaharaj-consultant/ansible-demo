@@ -466,6 +466,12 @@
         name: docker
       tags: docker
 
+    - name: Change docker.sock Permissions 
+      ansible.builtin.file:
+        path: /var/run/docker.sock
+        mode: "0660"
+      tags: docker_perm
+
     - name: Storing ssh public key for jenkins node.
       ansible.builtin.fetch:
         src: /home/vagrant/.ssh/id_rsa.pub
