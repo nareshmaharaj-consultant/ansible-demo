@@ -41,7 +41,7 @@
 
     - name: Add Jenkins Node Key to Authorized Keys
       ansible.posix.authorized_key:
-        user: vagrant  # Assuming user with access to deploy software
+        user: "{{ user }}"
         key: "{{ jenkins_node_key }}"
         state: present
 
@@ -72,22 +72,28 @@
 
     - name: Get Scala Info
       ansible.builtin.shell:
-        cmd: "set -o pipefail;'{{ scala_binary }}' --version | grep default | awk '{print $1}'"
+        cmd: "set -o pipefail;[ -f {{ scala_binary}} ] && echo Scala || echo 0"
       register: scala_present
       changed_when: scala_present.stdout == ""
       become: true
       become_user: "{{ user }}"
       tags: scala_i
-
+      
     - name: Download Scala
       ansible.builtin.get_url:
-        url: "{{ scala_download_url }}"
+        url: "{{ scala_download_url_arm }}"
         dest: "{{ scala_install_loc }}"
         mode: '0766'
       when: scala_present.stdout.find('Scala') == -1
       become: true
       become_user: "{{ user }}"
       tags: scala_download
+
+    - name: gunzip extract
+      ansible.builtin.shell:
+        cmd: gunzip -cf {{ scala_install_loc }} > cs
+      when: scala_present.stdout.find('Scala') == -1
+      tags: scala_download_extract
 
     - name: Install Scala
       ansible.builtin.shell: chmod +x cs && ./cs setup -y
@@ -96,13 +102,13 @@
       changed_when: result.rc == 0
       become: true
       become_user: "{{ user }}"
-      tags: scala_download
+      tags: scala_install
 
     - name: Remove Scala Install
       ansible.builtin.file:
         path: "{{ scala_install_loc }}"
         state: absent
-      tags: scala_download
+      tags: scala_clean
 
     # Install Python
     - name: Group Install Development Tools
@@ -122,7 +128,7 @@
 
     - name: Get Python Info
       ansible.builtin.shell:
-        cmd: "set -o pipefail;'{{ python_exec_path }}' --version | awk {'print $2'}"
+        cmd: "set -o pipefail;[ -f {{ python_exec_path }} ] && echo `{{ python_exec_path }} --version` || echo 0"
       register: python_present
       changed_when: python_present.stdout.find(python_version) == -1
       tags:
@@ -194,7 +200,7 @@
       tags: pip_dep
 
     # -- Python Packages Installed using pip -- #
-    - name: Python Packages Requuired Using pip
+    - name: Python Packages Required Using pip
       ansible.builtin.pip:
         name: "{{ item }}"
         state: present
@@ -305,6 +311,13 @@
       tags: jenkins-repo
       become: true
 
+    - name: "Ignore cert check"
+      ansible.builtin.lineinfile:
+        path: /etc/yum.repos.d/jenkins.repo
+        state: present
+        line: "sslverify={{ jenkins_ssl_verify }}"
+      tags: libs
+
     - name: Install Jenkin Dependencies
       ansible.builtin.dnf:
         name: "{{ item }}"
@@ -391,7 +404,7 @@
       tags: pip_dep
 
     # -- Python Packages Installed using pip -- #
-    - name: Python Packages Requuired Using pip
+    - name: Python Packages Required Using pip
       ansible.builtin.pip:
         name: "{{ item }}"
         state: present
@@ -404,6 +417,14 @@
   hosts: jenkins-node
   become: true
   tasks:
+    # -- Add repo - check with yum repolist
+    - name: Add Docker Repo
+      ansible.builtin.yum_repository:
+        name: docker-ce-stable
+        description: Docker CE Repo
+        baseurl: https://download.docker.com/linux/centos/docker-ce.repo
+      tags: docker-repo
+
     - name: Install Jenkin Dependencies
       ansible.builtin.dnf:
         name: "{{ item }}"
@@ -421,21 +442,13 @@
       tags: pip_dep
 
     # -- Python Packages Installed using pip -- #
-    - name: Python Packages Requuired Using pip
+    - name: Python Packages Required Using pip
       ansible.builtin.pip:
         name: "{{ item }}"
         state: present
       loop: "{{ python_pip_installs_req | default([]) }}"
       when: python_pip_installs_req | length > 0
       tags: pip_lib_installs
-
-    # -- Add repo - check with yum repolist
-    - name: Add Docker Repo
-      ansible.builtin.yum_repository:
-        name: docker-ce-stable
-        description: Docker CE Repo
-        baseurl: https://download.docker.com/linux/centos/docker-ce.repo
-      tags: docker
 
     # -- Install Docker libs
     - name: Install Docker Libs
@@ -474,8 +487,17 @@
 
     - name: Storing ssh public key for jenkins node.
       ansible.builtin.fetch:
-        src: /home/vagrant/.ssh/id_rsa.pub
+        src: "/home/{{ user }}/.ssh/id_rsa.pub"
         dest: jenkins_node_pub_key/
         flat: true
       tags: get_jenkins_node_pub
       become: true
+
+    - name: mkdir for jenkins jobs
+      ansible.builtin.file:
+        path: /home/{{ user }}/jenkins_jobs
+        state: directory
+        mode: "0755"
+      tags: mkdir_jenkins_jobs
+      become: true
+
