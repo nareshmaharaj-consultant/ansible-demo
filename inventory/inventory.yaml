@@ -6,22 +6,29 @@ all:
   children:
     deploy_machines:
       hosts:
-        broker01:
-          ansible_host: 192.168.56.151
-          ansible_ssh_user: vagrant
-          ansible_ssh_private_key_file: /Users/nareshmaharaj/.ssh/id_ed25519
-          ansible_python_interpreter: /usr/bin/python
-          ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
-        broker02:
-          ansible_host: 192.168.56.152
-          ansible_ssh_user: vagrant
-          ansible_ssh_private_key_file: /Users/nareshmaharaj/.ssh/id_ed25519
-          ansible_python_interpreter: /usr/bin/python
-          ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
         broker03:
-          ansible_host: 192.168.56.153
-          ansible_ssh_user: vagrant
-          ansible_ssh_private_key_file: /Users/nareshmaharaj/.ssh/id_ed25519
+          ansible_host: broker03
+          ansible_ssh_user: "nmaharaj"
+          # Fails on arm64
+          # ansible_ssh_private_key_file: "/Users/nmaharaj/.ssh/id_ed25519"
+          ansible_ssh_private_key_file: '/Users/nmaharaj/Documents/ansible/execution_environment/private_key/id_ed25519'
+          ansible_private_key_file: /Users/nmaharaj/.ssh/id_rsa
+          ansible_python_interpreter: /usr/bin/python
+          ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
+        broker04:
+          ansible_host: broker04
+          ansible_ssh_user: nmaharaj
+          # Fails on arm64
+          # ansible_ssh_private_key_file: "/Users/nmaharaj/.ssh/id_ed25519"
+          ansible_ssh_private_key_file: '/Users/nmaharaj/Documents/ansible/execution_environment/private_key/id_ed25519'
+          ansible_python_interpreter: /usr/bin/python
+          ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
+        broker05:
+          ansible_host: broker05
+          ansible_ssh_user: nmaharaj
+          # Fails on arm
+          # ansible_ssh_private_key_file: "/Users/nmaharaj/.ssh/id_ed25519"
+          ansible_ssh_private_key_file: '/Users/nmaharaj/Documents/ansible/execution_environment/private_key/id_ed25519'
           ansible_python_interpreter: /usr/bin/python
           ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
       vars:
@@ -33,7 +40,6 @@ all:
           - gcc
           - maven
           - bind-utils
-          - java-11-openjdk.x86_64
           - java-11-openjdk
           - java-11-openjdk-devel
           - cairo-devel
@@ -80,16 +86,19 @@ all:
           - 22/tcp
         java_dir_loc: /etc/alternatives/java_sdk_11_openjdk/bin/
         java_dir_link_to: /usr/bin/
-        scala_install_loc: /home/vagrant/cs
-        scala_binary: /home/vagrant/.local/share/coursier/bin/scala
-        scala_download_url: https://github.com/coursier/coursier/releases/latest/download/cs-x86_64-pc-linux.gz
-        user: vagrant
+        scala_install_loc: /home/nmaharaj/cs-aarch64-pc-linux.gz
+        scala_binary: /home/nmaharaj/.local/share/coursier/bin/scala
+        scala_download_url_arm: https://github.com/VirtusLab/coursier-m1/releases/latest/download/cs-aarch64-pc-linux.gz
+        scala_download_url_amd: https://github.com/coursier/coursier/releases/latest/download/cs-aarch64-pc-linux.gz
+        user: nmaharaj
     jenkins:
       hosts:
-        broker04:
-          ansible_host: 192.168.56.154
-          ansible_ssh_user: vagrant
-          ansible_ssh_private_key_file: /Users/nareshmaharaj/.ssh/id_ed25519
+        broker01:
+          ansible_host: broker01
+          ansible_ssh_user: nmaharaj
+          # Fails on arm
+          # ansible_ssh_private_key_file: "/Users/nmaharaj/.ssh/id_ed25519"
+          ansible_ssh_private_key_file: '/Users/nmaharaj/Documents/ansible/execution_environment/private_key/id_ed25519'
           ansible_python_interpreter: /usr/bin/python
           ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
       vars:
@@ -101,6 +110,7 @@ all:
           - wget
           - git
           - python3-devel
+        jenkins_ssl_verify: false
         jenkins_gpg_key_url: "https://pkg.jenkins.io/redhat-stable/jenkins.io.key"
         jenkins_repo_url: "https://pkg.jenkins.io/redhat-stable/jenkins.repo"
         jenkins_repo_dest: /etc/yum.repos.d/jenkins.repo
@@ -108,12 +118,16 @@ all:
         pip_min_dep: packaging
         python_pip_installs_req:
           - ansible-lint
+        firewall_ports:
+          - 8080/tcp
     jenkins-node:
       hosts:
-        broker05:
-          ansible_host: 192.168.56.155
-          ansible_ssh_user: vagrant
-          ansible_ssh_private_key_file: /Users/nareshmaharaj/.ssh/id_ed25519
+        broker02:
+          ansible_host: broker02
+          ansible_ssh_user: nmaharaj
+          # Fails on arm
+          # ansible_ssh_private_key_file: "/Users/nmaharaj/.ssh/id_ed25519"
+          ansible_ssh_private_key_file: '/Users/nmaharaj/Documents/ansible/execution_environment/private_key/id_ed25519'
           ansible_python_interpreter: /usr/bin/python
           ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
       vars:
@@ -134,5 +148,4 @@ all:
         pip_min_dep: packaging
         python_pip_installs_req:
           - ansible-lint
-          - ansible-navigator
-        user: vagrant
+        user: nmaharaj
